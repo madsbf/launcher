@@ -1,0 +1,59 @@
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable name="appViewModel" type="me.madsbf.launcher.viewmodel.AppViewModel"/>
+    </data>
+
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:cardCornerRadius="0dp"
+        android:elevation="2dp"
+        app:state="@{appViewModel.state}"
+        android:onClick="@{appViewModel.onClickApp}"
+        android:foreground="?android:attr/selectableItemBackground">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="visible"
+            app:iconPalette="@{appViewModel.iconPalette}"
+            android:id="@+id/colorBackground"/>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/border"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:orientation="vertical">
+            <ImageView
+                android:layout_gravity="center"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_margin="8dp"
+                tools:src="@mipmap/ic_launcher"
+                android:id="@+id/image"
+                android:src="@{appViewModel.icon}"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:textSize="12sp"
+                android:maxLines="1"
+                android:ellipsize="end"
+                tools:text="Launcher"
+                android:gravity="center_horizontal"
+                android:layout_gravity="center_horizontal"
+                android:text="@{appViewModel.title}"
+                app:textPalette="@{appViewModel.iconPalette}"/>
+        </LinearLayout>
+    </android.support.v7.widget.CardView>
+</layout>
