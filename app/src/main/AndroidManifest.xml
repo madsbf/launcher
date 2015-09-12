@@ -9,6 +9,7 @@
         android:theme="@style/AppTheme"
         android:launchMode="singleTask"
         android:hardwareAccelerated="true"
+        android:persistent="true"
         android:stateNotNeeded="true" >
         <activity
             android:name=".MainActivity"
