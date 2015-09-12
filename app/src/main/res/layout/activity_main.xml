@@ -39,17 +39,17 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:background="#ffffff">
+                <ProgressBar
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"/>
                 <android.support.v7.widget.RecyclerView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:clipToPadding="false"
                     android:clipChildren="false"
-                    android:id="@+id/recycler"/>
-                <ProgressBar
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:visibility="@{viewModel.loadingVisibility}"/>
+                    android:id="@+id/recycler"
+                    app:visible="@{viewModel.contentVisibility}"/>
             </FrameLayout>
         </LinearLayout>
 

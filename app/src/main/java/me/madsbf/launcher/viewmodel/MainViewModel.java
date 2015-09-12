@@ -21,6 +21,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.graphics.Palette;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -39,6 +40,9 @@ public class MainViewModel extends BaseObservable {
 
     @Bindable
     public final ObservableInt loadingVisibility = new ObservableInt();
+
+    @Bindable
+    public final ObservableBoolean contentVisibility = new ObservableBoolean();
 
     final Context context;
 
@@ -63,26 +67,27 @@ public class MainViewModel extends BaseObservable {
             }
         });
         loadingVisibility.set(View.VISIBLE);
+        contentVisibility.set(true);
     }
 
-    @BindingAdapter({"android:visibility"})
-    public static void setLoadingVisibility(final ProgressBar progressBar, final int visibility) {
-        if(visibility == View.VISIBLE && progressBar.getVisibility() != View.VISIBLE) {
-            Animation fadeIn = AnimationUtils.loadAnimation(progressBar.getContext(), android.R.anim.fade_in);
-            progressBar.startAnimation(fadeIn);
-            progressBar.setVisibility(View.VISIBLE);
-        } else {
-            Animation fadeOut = AnimationUtils.loadAnimation(progressBar.getContext(), android.R.anim.fade_out);
+    @BindingAdapter({"bind:visible"})
+    public static void setVisible(final View view, final boolean visible) {
+        if(visible&& view.getVisibility() != View.VISIBLE) {
+            Animation fadeIn = AnimationUtils.loadAnimation(view.getContext(), android.R.anim.fade_in);
+            view.startAnimation(fadeIn);
+            view.setVisibility(View.VISIBLE);
+        } else if(!visible && view.getVisibility() == View.VISIBLE) {
+            Animation fadeOut = AnimationUtils.loadAnimation(view.getContext(), android.R.anim.fade_out);
             fadeOut.setAnimationListener(new Animation.AnimationListener() {
                 @Override public void onAnimationStart(Animation animation) {}
                 @Override public void onAnimationRepeat(Animation animation) {}
 
                 @Override
                 public void onAnimationEnd(Animation animation) {
-                    progressBar.setVisibility(visibility);
+                    view.setVisibility(View.INVISIBLE);
                 }
             });
-            progressBar.startAnimation(fadeOut);
+            view.startAnimation(fadeOut);
         }
     }
 
