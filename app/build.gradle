@@ -32,14 +32,19 @@ android {
 
     signingConfigs {
         release {
+            // Hack: These values are overwritten, but are needed in order to get an aligned APK.
+            storeFile file("/path/to/keystore")
+            storePassword ""
+            keyAlias ""
+            keyPassword ""
         }
     }
 
     buildTypes {
         release {
+            signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.release
         }
     }
 
