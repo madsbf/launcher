@@ -7,13 +7,14 @@
         <variable name="appViewModel" type="me.madsbf.launcher.viewmodel.AppViewModel"/>
     </data>
 
-    <android.support.v7.widget.CardView
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:cardCornerRadius="0dp"
         android:elevation="2dp"
+        android:clipChildren="false"
         app:state="@{appViewModel.state}"
         android:onClick="@{appViewModel.onClickApp}"
+        android:background="#ffffff"
         android:foreground="?android:attr/selectableItemBackground">
 
         <FrameLayout
@@ -55,5 +56,17 @@
                 android:text="@{appViewModel.title}"
                 app:textSwatch="@{appViewModel.iconSwatch}"/>
         </LinearLayout>
-    </android.support.v7.widget.CardView>
+
+        <android.support.design.widget.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center"
+            app:fabSize="mini"
+            android:layout_marginBottom="-24dp"
+            android:src="@drawable/ic_clear_24dp"
+            app:deleteState="@{appViewModel.state}"
+            android:onClick="@{appViewModel.onClickDelete}"
+            tools:visibility="visible"
+            android:visibility="invisible"/>
+    </FrameLayout>
 </layout>

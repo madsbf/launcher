@@ -3,6 +3,7 @@ package me.madsbf.launcher.viewmodel;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
@@ -14,7 +15,9 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.graphics.ColorUtils;
@@ -140,6 +143,21 @@ public class AppViewModel extends BaseObservable implements OnBindListener {
         }
     }
 
+    @BindingAdapter({"bind:deleteState"})
+    public static void setDeleteState(final View view, State state) {
+        if(state == State.LIFTED) {
+            if(view.getScaleX() != 1) {
+                view.animate().scaleY(1).scaleX(1);
+                view.setVisibility(View.VISIBLE);
+            }
+        } else {
+            if(view.getScaleX() != 0) {
+                view.animate().scaleY(0).scaleX(0);
+                view.setVisibility(View.VISIBLE);
+            }
+        }
+    }
+
     public View.OnClickListener onClickApp()
     {
         return new View.OnClickListener()
@@ -160,6 +178,22 @@ public class AppViewModel extends BaseObservable implements OnBindListener {
                         ActivityCompat.startActivity(((Activity) v.getContext()), intent, options.toBundle());
                         break;
                 }
+            }
+        };
+    }
+
+    public View.OnClickListener onClickDelete()
+    {
+        return new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                Uri packageUri = Uri.parse("package:" + app.getPackageName());
+                Intent uninstallIntent =
+                        new Intent(Intent.ACTION_UNINSTALL_PACKAGE, packageUri);
+                v.getContext().startActivity(uninstallIntent);
+                state.set(State.NORMAL);
             }
         };
     }

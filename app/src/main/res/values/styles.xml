@@ -5,7 +5,8 @@
         <item name="android:windowTranslucentStatus">true</item>
         <item name="android:colorPrimary">#009688</item>
         <item name="android:colorPrimaryDark">#004D40</item>
-        <item name="android:colorAccent">#F44336</item>
+        <item name="android:colorAccent">@color/red</item>
+        <item name="colorAccent">@color/red</item>
 
         <!-- enable window content transitions -->
         <item name="android:windowContentTransitions">true</item>

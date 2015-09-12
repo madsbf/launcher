@@ -66,7 +66,7 @@ public class MainViewModel extends BaseObservable {
                 }.execute();
             }
         });
-        loadingVisibility.set(View.VISIBLE);
+        loadingVisibility.set(View.INVISIBLE);
         contentVisibility.set(true);
     }
 
