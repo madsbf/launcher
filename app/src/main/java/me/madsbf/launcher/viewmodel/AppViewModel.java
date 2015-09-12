@@ -81,6 +81,7 @@ public class AppViewModel extends BaseObservable implements OnBindListener {
                 }.execute();
             }
         });
+
         icon.set(app.getIcon());
         title.set(app.getTitle());
         state.set(State.NORMAL);

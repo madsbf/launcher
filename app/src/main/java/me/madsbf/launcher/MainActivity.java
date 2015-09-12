@@ -10,9 +10,11 @@ import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
+import android.transition.Slide;
 import android.view.View;
 
 import com.crashlytics.android.Crashlytics;
@@ -96,5 +98,12 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == 1) {
             mainViewModel.image.set(WallpaperManager.getInstance(this).getDrawable());
         }
+    }
+
+    @Override
+    protected void onResume() {
+        overridePendingTransition(R.anim.still_bottom, R.anim.slide_out_bottom);
+        super.onResume();
+
     }
 }
