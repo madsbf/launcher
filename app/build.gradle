@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.android.databinding'
 apply plugin: 'kotlin-android'
+apply plugin: 'io.fabric'
 
 allprojects {
     afterEvaluate { project ->
@@ -46,6 +47,9 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+        debug {
+            ext.enableCrashlytics = false
+        }
     }
 
     sourceSets {
@@ -66,4 +70,7 @@ dependencies {
     compile 'org.jetbrains.kotlin:kotlin-stdlib:0.12.1230'
     compile 'io.reactivex:rxandroid:1.0.1'
     compile 'io.reactivex:rxjava:1.0.14'
+    compile('com.crashlytics.sdk.android:crashlytics:2.5.2@aar') {
+        transitive = true;
+    }
 }

@@ -15,7 +15,10 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.view.View;
 
+import com.crashlytics.android.Crashlytics;
+
 import dk.shape.library.collections.adapters.RecyclerAdapter;
+import io.fabric.sdk.android.Fabric;
 import me.madsbf.launcher.databinding.ActivityMainBinding;
 import me.madsbf.launcher.model.DataManager;
 import me.madsbf.launcher.viewmodel.AppViewModel;
@@ -28,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Fabric.with(this, new Crashlytics());
         final ActivityMainBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
         mainViewModel = new MainViewModel(this);
