@@ -84,6 +84,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             protected void onPostExecute(RecyclerAdapter recyclerAdapter) {
                 super.onPostExecute(recyclerAdapter);
+                mainViewModel.loadingVisibility.set(View.INVISIBLE);
                 for(int i = 0; i < recyclerAdapter.getItemCount(); i++){
                     recyclerAdapter.notifyItemInserted(i);
                 }

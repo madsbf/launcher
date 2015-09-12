@@ -10,7 +10,9 @@ import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
 import android.databinding.Observable;
+import android.databinding.ObservableBoolean;
 import android.databinding.ObservableField;
+import android.databinding.ObservableInt;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -23,6 +25,7 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 
 import dk.shape.allanaction.ImageAnimator;
 
@@ -33,6 +36,9 @@ public class MainViewModel extends BaseObservable {
 
     @Bindable
     public final ObservableField<Palette> palette = new ObservableField<>();
+
+    @Bindable
+    public final ObservableInt loadingVisibility = new ObservableInt();
 
     final Context context;
 
@@ -56,6 +62,28 @@ public class MainViewModel extends BaseObservable {
                 }.execute();
             }
         });
+        loadingVisibility.set(View.VISIBLE);
+    }
+
+    @BindingAdapter({"android:visibility"})
+    public static void setLoadingVisibility(final ProgressBar progressBar, final int visibility) {
+        if(visibility == View.VISIBLE && progressBar.getVisibility() != View.VISIBLE) {
+            Animation fadeIn = AnimationUtils.loadAnimation(progressBar.getContext(), android.R.anim.fade_in);
+            progressBar.startAnimation(fadeIn);
+            progressBar.setVisibility(View.VISIBLE);
+        } else {
+            Animation fadeOut = AnimationUtils.loadAnimation(progressBar.getContext(), android.R.anim.fade_out);
+            fadeOut.setAnimationListener(new Animation.AnimationListener() {
+                @Override public void onAnimationStart(Animation animation) {}
+                @Override public void onAnimationRepeat(Animation animation) {}
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    progressBar.setVisibility(visibility);
+                }
+            });
+            progressBar.startAnimation(fadeOut);
+        }
     }
 
     @BindingAdapter({"bind:palette"})
