@@ -34,7 +34,7 @@ public class AppViewModel extends BaseObservable implements OnBindListener {
     public final ObservableField<Drawable> icon = new ObservableField<>();
 
     @Bindable
-    public final ObservableField<Palette> iconPalette = new ObservableField<>();
+    public final ObservableField<Palette.Swatch> iconSwatch = new ObservableField<>();
 
     @Bindable
     public final ObservableField<String> title = new ObservableField<>();
@@ -49,17 +49,34 @@ public class AppViewModel extends BaseObservable implements OnBindListener {
         icon.addOnPropertyChangedCallback(new OnPropertyChangedCallback() {
             @Override
             public void onPropertyChanged(Observable sender, int propertyId) {
-                new AsyncTask<Void, Void, Palette>() {
+                new AsyncTask<Void, Void, Palette.Swatch>() {
                     @Override
-                    protected Palette doInBackground(Void... params) {
+                    protected Palette.Swatch doInBackground(Void... params) {
                         Bitmap bitmap = ((BitmapDrawable) icon.get()).getBitmap();
-                        return Palette.from(bitmap).generate();
+                        Palette palette = Palette.from(bitmap).generate();
+                        Palette.Swatch swatch = palette.getLightVibrantSwatch();
+                        if(swatch == null) {
+                            swatch = palette.getLightMutedSwatch();
+                            if(swatch == null) {
+                                swatch = palette.getVibrantSwatch();
+                                if(swatch == null) {
+                                    swatch = palette.getMutedSwatch();
+                                    if(swatch == null) {
+                                        swatch = palette.getDarkVibrantSwatch();
+                                        if(swatch == null) {
+                                            swatch = palette.getDarkMutedSwatch();
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        return swatch;
                     }
 
                     @Override
-                    protected void onPostExecute(Palette palette) {
-                        super.onPostExecute(palette);
-                        AppViewModel.this.iconPalette.set(palette);
+                    protected void onPostExecute(Palette.Swatch swatch) {
+                        super.onPostExecute(swatch);
+                        AppViewModel.this.iconSwatch.set(swatch);
                     }
                 }.execute();
             }
@@ -69,59 +86,19 @@ public class AppViewModel extends BaseObservable implements OnBindListener {
         state.set(State.NORMAL);
     }
 
-    @BindingAdapter({"bind:textPalette"})
-    public static void setTextPalette(final TextView view, Palette palette) {
-        if(palette != null) {
-            Palette.Swatch swatch = palette.getLightVibrantSwatch();
-            if(swatch == null) {
-                swatch = palette.getLightMutedSwatch();
-                if(swatch == null) {
-                    swatch = palette.getVibrantSwatch();
-                    if(swatch == null) {
-                        swatch = palette.getMutedSwatch();
-                        if(swatch == null) {
-                            swatch = palette.getDarkVibrantSwatch();
-                            if(swatch == null) {
-                                swatch = palette.getDarkMutedSwatch();
-                            }
-                        }
-                    }
-                }
-            }
-
+    @BindingAdapter({"bind:textSwatch"})
+    public static void setTextSwatch(final TextView view, Palette.Swatch swatch) {
+        if(swatch != null) {
             view.setTextColor(swatch.getRgb());
         }
     }
 
-    @BindingAdapter({"bind:iconPalette"})
-    public static void setPalette(final View view, Palette palette) {
-        if(palette != null) {
-            Palette.Swatch swatch = palette.getLightVibrantSwatch();
-            if(swatch == null) {
-                swatch = palette.getLightMutedSwatch();
-                if(swatch == null) {
-                    swatch = palette.getVibrantSwatch();
-                    if(swatch == null) {
-                        swatch = palette.getMutedSwatch();
-                        if(swatch == null) {
-                            swatch = palette.getDarkVibrantSwatch();
-                            if(swatch == null) {
-                                swatch = palette.getDarkMutedSwatch();
-                            }
-                        }
-                    }
-                }
-            }
-
-            if(view.getVisibility() != View.VISIBLE) {
-                //fadeIn(swatch, view);
-            } else {
-                if(swatch != null) {
-                    view.setBackgroundColor(ColorUtils.setAlphaComponent(swatch.getRgb(), 35));
-                } else {
-                    view.setBackgroundColor(Color.parseColor("#f9f9f9"));
-                }
-            }
+    @BindingAdapter({"bind:iconSwatch"})
+    public static void setSwatch(final View view, Palette.Swatch swatch) {
+        if(swatch != null) {
+            view.setBackgroundColor(ColorUtils.setAlphaComponent(swatch.getRgb(), 35));
+        } else {
+            view.setBackgroundColor(Color.parseColor("#f9f9f9"));
         }
     }
 
@@ -147,19 +124,19 @@ public class AppViewModel extends BaseObservable implements OnBindListener {
         }
         float z = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, zDp, view.getContext().getResources().getDisplayMetrics());
 
-        ViewPropertyAnimator animator = view.animate()
-                .scaleX(scale)
-                .scaleY(scale)
-                .z(z)
-                .setInterpolator(new AccelerateDecelerateInterpolator());
-
+        float alpha = 1f;
         if(state == State.DEACTIVATED) {
-            animator.alpha(0.5f);
-        } else {
-            animator.alpha(1f);
+            alpha = 0.5f;
         }
 
-        animator.start();
+        if(view.getZ() != z || view.getAlpha() != alpha) {
+            ViewPropertyAnimator animator = view.animate()
+                    .scaleX(scale)
+                    .scaleY(scale)
+                    .z(z)
+                    .alpha(alpha)
+                    .setInterpolator(new AccelerateDecelerateInterpolator());
+        }
     }
 
     public View.OnClickListener onClickApp()
