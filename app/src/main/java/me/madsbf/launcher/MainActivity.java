@@ -101,6 +101,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         overridePendingTransition(R.anim.still_bottom, R.anim.slide_out_bottom);
         super.onResume();
-
     }
+
+    @Override
+    public void onBackPressed() {}
 }
