@@ -1,5 +1,6 @@
 package me.madsbf.launcher.viewmodel;
 
+import android.animation.Animator;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -147,13 +148,37 @@ public class AppViewModel extends BaseObservable implements OnBindListener {
     public static void setDeleteState(final View view, State state) {
         if(state == State.LIFTED) {
             if(view.getScaleX() != 1) {
-                view.animate().scaleY(1).scaleX(1);
+                view.animate().setListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {}
+                    @Override
+                    public void onAnimationEnd(Animator animation) {}
+                    @Override
+                    public void onAnimationCancel(Animator animation) {}
+                    @Override
+                    public void onAnimationRepeat(Animator animation) {}
+                }).scaleY(1).scaleX(1);
+                view.setVisibility(View.VISIBLE);
+            } else if(view.getVisibility() != View.VISIBLE) {
                 view.setVisibility(View.VISIBLE);
             }
         } else {
-            if(view.getScaleX() != 0) {
-                view.animate().scaleY(0).scaleX(0);
-                view.setVisibility(View.VISIBLE);
+            if(view.getScaleX() != 0 && view.getVisibility() == View.VISIBLE) {
+                view.animate().setListener(new Animator.AnimatorListener() {
+                    @Override public void onAnimationStart(Animator animation) {}
+                    @Override public void onAnimationCancel(Animator animation) {}
+                    @Override public void onAnimationRepeat(Animator animation) {}
+
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        view.setVisibility(View.INVISIBLE);
+                        animation.removeListener(this);
+                    }
+
+                }).scaleY(0).scaleX(0).setInterpolator(new AccelerateDecelerateInterpolator());
+            } else if(view.getScaleX() != 0) {
+                view.setScaleX(0);
+                view.setScaleY(0);
             }
         }
     }
