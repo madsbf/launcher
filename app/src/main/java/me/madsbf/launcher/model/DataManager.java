@@ -45,6 +45,11 @@ public class DataManager {
             String packageName = info.activityInfo.packageName;
             Drawable icon = info.activityInfo.loadIcon(manager);
             apps.onNext(new App(title, packageName, icon));
+            try {
+                Thread.sleep(10l);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

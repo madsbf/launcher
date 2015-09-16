@@ -129,18 +129,43 @@ public class AppViewModel extends BaseObservable implements OnBindListener {
         }
         float z = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, zDp, view.getContext().getResources().getDisplayMetrics());
 
-        float alpha = 1f;
-        if(state == State.DEACTIVATED) {
-            alpha = 0.5f;
-        }
-
-        if(view.getZ() != z || view.getAlpha() != alpha) {
+        if(view.getZ() != z) {
             ViewPropertyAnimator animator = view.animate()
                     .scaleX(scale)
                     .scaleY(scale)
                     .z(z)
-                    .alpha(alpha)
                     .setInterpolator(new AccelerateDecelerateInterpolator());
+        }
+    }
+
+    @BindingAdapter({"bind:overlayState"})
+    public static void setOverlayState(final View view, State state) {
+        final float alpha = state == State.DEACTIVATED ? 1 : 0;
+
+        if(view.getAlpha() != alpha) {
+            view.animate()
+                    .setInterpolator(new AccelerateDecelerateInterpolator())
+                    .setListener(new Animator.AnimatorListener() {
+                        @Override
+                        public void onAnimationStart(Animator animation) {
+                        }
+
+                        @Override
+                        public void onAnimationRepeat(Animator animation) {
+                        }
+
+                        @Override
+                        public void onAnimationCancel(Animator animation) {
+                        }
+
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            if (alpha == 0) {
+                                view.setVisibility(View.INVISIBLE);
+                            }
+                        }
+                    }).alpha(alpha);
+            view.setVisibility(View.VISIBLE);
         }
     }
 
@@ -148,34 +173,34 @@ public class AppViewModel extends BaseObservable implements OnBindListener {
     public static void setDeleteState(final View view, State state) {
         if(state == State.LIFTED) {
             if(view.getScaleX() != 1) {
-                view.animate().setListener(new Animator.AnimatorListener() {
-                    @Override
-                    public void onAnimationStart(Animator animation) {}
-                    @Override
-                    public void onAnimationEnd(Animator animation) {}
-                    @Override
-                    public void onAnimationCancel(Animator animation) {}
-                    @Override
-                    public void onAnimationRepeat(Animator animation) {}
-                }).scaleY(1).scaleX(1);
+                view.animate()
+                        .setInterpolator(new AccelerateDecelerateInterpolator())
+                        .setListener(new Animator.AnimatorListener() {
+                            @Override public void onAnimationStart(Animator animation) {}
+                            @Override public void onAnimationEnd(Animator animation) {}
+                            @Override public void onAnimationCancel(Animator animation) {}
+                            @Override public void onAnimationRepeat(Animator animation) {}
+                        }).scaleY(1).scaleX(1);
                 view.setVisibility(View.VISIBLE);
             } else if(view.getVisibility() != View.VISIBLE) {
                 view.setVisibility(View.VISIBLE);
             }
         } else {
             if(view.getScaleX() != 0 && view.getVisibility() == View.VISIBLE) {
-                view.animate().setListener(new Animator.AnimatorListener() {
-                    @Override public void onAnimationStart(Animator animation) {}
-                    @Override public void onAnimationCancel(Animator animation) {}
-                    @Override public void onAnimationRepeat(Animator animation) {}
+                view.animate()
+                        .setInterpolator(new AccelerateDecelerateInterpolator())
+                        .setListener(new Animator.AnimatorListener() {
+                            @Override public void onAnimationStart(Animator animation) {}
+                            @Override public void onAnimationCancel(Animator animation) {}
+                            @Override public void onAnimationRepeat(Animator animation) {}
 
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        view.setVisibility(View.INVISIBLE);
-                        animation.removeListener(this);
-                    }
+                            @Override
+                            public void onAnimationEnd(Animator animation) {
+                                view.setVisibility(View.INVISIBLE);
+                                animation.removeListener(this);
+                            }
 
-                }).scaleY(0).scaleX(0).setInterpolator(new AccelerateDecelerateInterpolator());
+                        }).scaleY(0).scaleX(0).setInterpolator(new AccelerateDecelerateInterpolator());
             } else if(view.getScaleX() != 0) {
                 view.setScaleX(0);
                 view.setScaleY(0);
