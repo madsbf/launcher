@@ -1,7 +1,9 @@
 package me.madsbf.launcher;
 
 import android.app.WallpaperManager;
+import android.content.BroadcastReceiver;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.databinding.DataBindingUtil;
 import android.databinding.Observable;
 import android.os.AsyncTask;
@@ -30,10 +32,10 @@ public class MainActivity extends AppCompatActivity {
     MainViewModel mainViewModel;
     DataManager dataManager;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         Fabric.with(this, new Crashlytics.Builder().core(new CrashlyticsCore.Builder().disabled(BuildConfig.DEBUG_MODE).build()).build());
 
         final ActivityMainBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
@@ -92,9 +94,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == 1) {
-            dataManager.wallpaper.onNext(WallpaperManager.getInstance(this).getDrawable());
-        }
     }
 
     @Override

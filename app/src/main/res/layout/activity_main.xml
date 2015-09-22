@@ -24,14 +24,12 @@
                 android:onClick="@{viewModel.onClickImage}"
                 android:foreground="?android:attr/selectableItemBackground"
                 android:background="#f9f9f9">
-                <ImageView
+                <dk.shape.allanaction.EaseImageView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    app:animationDuration="3200"
                     android:scaleType="centerCrop"
-                    android:visibility="invisible"
-                    app:drawable="@{viewModel.image}"
-                    tools:visibility="visible"
-                    tools:src="@drawable/peter_paint"/>
+                    app:drawable="@{viewModel.image}"/>
             </FrameLayout>
 
             <FrameLayout

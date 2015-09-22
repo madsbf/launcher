@@ -28,6 +28,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
+import dk.shape.allanaction.EaseImageView;
 import dk.shape.allanaction.ImageAnimator;
 import me.madsbf.launcher.model.DataManager;
 import rx.android.schedulers.AndroidSchedulers;
@@ -162,27 +163,9 @@ public class MainViewModel extends BaseObservable {
     }
 
     @BindingAdapter({"bind:drawable"})
-    public static void setDrawable(final ImageView imageView, final Drawable drawable) {
+    public static void setDrawable(final EaseImageView imageView, final Drawable drawable) {
         if(drawable != null) {
-            if(imageView.getVisibility() == View.INVISIBLE) {
-                imageView.setImageDrawable(drawable);
-                ImageAnimator.easeImageViewIn(imageView, 1600);
-            } else {
-                Animation fadeOutAnim = AnimationUtils.loadAnimation(imageView.getContext(), android.R.anim.fade_out);
-                fadeOutAnim.setAnimationListener(new Animation.AnimationListener() {
-                    @Override public void onAnimationStart(Animation animation) {}
-                    @Override public void onAnimationRepeat(Animation animation) {}
-
-                    @Override
-                    public void onAnimationEnd(Animation animation) {
-                        imageView.setVisibility(View.INVISIBLE);
-                        imageView.setImageDrawable(drawable);
-                        ImageAnimator.easeImageViewIn(imageView, 1600);
-                    }
-
-                });
-                imageView.startAnimation(fadeOutAnim);
-            }
+            imageView.setImageDrawable(drawable);
         }
     }
 

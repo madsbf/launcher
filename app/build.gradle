@@ -68,7 +68,7 @@ dependencies {
     compile 'com.android.support:design:23.0.1'
     compile "com.android.support:support-v4:23.0.1"
     compile 'dk.shape.library:SHPCollections:2.0.0-rc1'
-    compile 'dk.shape.library:allanaction:1.0.0-alpha2'
+    compile 'dk.shape.library:allanaction:1.0.0-alpha5'
     compile 'org.jetbrains.kotlin:kotlin-stdlib:0.12.1230'
     compile 'io.reactivex:rxandroid:1.0.1'
     compile 'io.reactivex:rxjava:1.0.14'

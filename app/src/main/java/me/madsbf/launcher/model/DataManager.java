@@ -3,6 +3,7 @@ package me.madsbf.launcher.model;
 import android.app.WallpaperManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -14,8 +15,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import me.madsbf.launcher.AppBroadcastReceiver;
+import me.madsbf.launcher.PackageChange;
+import me.madsbf.launcher.WallpaperBroadcastReceiver;
 import me.madsbf.launcher.model.entities.App;
 import rx.Observable;
+import rx.functions.Action1;
 import rx.subjects.BehaviorSubject;
 
 public class DataManager {
@@ -23,9 +28,44 @@ public class DataManager {
     public final BehaviorSubject<App> apps = BehaviorSubject.create();
     public final BehaviorSubject<Drawable> wallpaper = BehaviorSubject.create();
 
-    public void initialize(Context context) {
+    public void initialize(final Context context) {
         loadWallpaper(context, wallpaper);
         loadApps(context, apps);
+
+        AppBroadcastReceiver appReceiver = new AppBroadcastReceiver();
+        context.registerReceiver(appReceiver, new IntentFilter(Intent.ACTION_PACKAGE_ADDED));
+        context.registerReceiver(appReceiver, new IntentFilter(Intent.ACTION_PACKAGE_REMOVED));
+
+        WallpaperBroadcastReceiver wallpaperReceiver = new WallpaperBroadcastReceiver();
+        context.registerReceiver(wallpaperReceiver, new IntentFilter(Intent.ACTION_WALLPAPER_CHANGED));
+
+        wallpaperReceiver.wallpaper.subscribe(new Action1<Drawable>() {
+            @Override
+            public void call(Drawable drawable) {
+                wallpaper.onNext(drawable);
+            }
+        });
+
+        /*
+        receiver.packageChange.subscribe(new Action1<PackageChange>() {
+            @Override
+            public void call(PackageChange packageChange) {
+                PackageManager manager = context.getPackageManager();
+                String[] packages = manager.getPackagesForUid(packageChange.uid);
+                switch(packageChange.event) {
+                    case Intent.ACTION_PACKAGE_ADDED:
+                        break;
+                    case Intent.ACTION_PACKAGE_REMOVED:
+                        for(String packageName : packages) {
+                            for(App app : apps) {
+
+                            }
+                        }
+                        break;
+                }
+            }
+        });
+        */
     }
 
     public void loadWallpaper(Context context, BehaviorSubject<Drawable> wallpaper) {
