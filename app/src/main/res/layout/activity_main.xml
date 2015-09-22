@@ -19,7 +19,6 @@
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:elevation="4dp"
                 android:layout_weight="1"
                 android:onClick="@{viewModel.onClickImage}"
                 android:foreground="?android:attr/selectableItemBackground"
@@ -35,6 +34,7 @@
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:elevation="4dp"
                 android:layout_weight="1"
                 android:background="#ffffff">
                 <ProgressBar
@@ -60,6 +60,7 @@
             android:src="@drawable/ic_search_24dp"
             android:onClick="@{viewModel.onClickFAB}"
             app:palette="@{viewModel.palette}"
+            app:activated="@{viewModel.searchButtonActivated}"
             tools:visibility="visible"
             android:visibility="invisible"/>
 

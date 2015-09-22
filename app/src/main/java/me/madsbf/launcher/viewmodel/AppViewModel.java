@@ -100,23 +100,13 @@ public class AppViewModel extends BaseObservable implements OnBindListener {
 
     @BindingAdapter({"bind:iconSwatch"})
     public static void setSwatch(final View view, Palette.Swatch swatch) {
+        /*
         if(swatch != null) {
             view.setBackgroundColor(ColorUtils.setAlphaComponent(swatch.getRgb(), 35));
         } else {
-            view.setBackgroundColor(Color.parseColor("#f9f9f9"));
+            view.setBackgroundColor(Color.parseColor("#ffffff"));
         }
-    }
-
-    private static void fadeIn(Palette.Swatch swatch, View view) {
-        if(swatch != null) {
-            view.setBackgroundColor(swatch.getRgb());
-        } else {
-            view.setBackgroundColor(Color.parseColor("#f9f9f9"));
-        }
-
-        view.setAlpha(0);
-        view.animate().alpha(0.2f);
-        view.setVisibility(View.VISIBLE);
+        */
     }
 
     @BindingAdapter({"bind:state"})

@@ -51,6 +51,7 @@
             android:src="@drawable/ic_search_24dp"
             android:onClick="@{viewModel.onClickFAB}"
             app:palette="@{viewModel.palette}"
+            app:activated="@{viewModel.searchButtonActivated}"
             tools:visibility="visible"
             android:visibility="invisible"/>
 

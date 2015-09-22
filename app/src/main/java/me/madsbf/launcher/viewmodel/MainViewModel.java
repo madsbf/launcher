@@ -50,6 +50,9 @@ public class MainViewModel extends BaseObservable {
     @Bindable
     public final ObservableBoolean contentVisibility = new ObservableBoolean();
 
+    @Bindable
+    public final ObservableBoolean searchButtonActivated = new ObservableBoolean();
+
     final Context context;
 
     public MainViewModel(Context context, DataManager dataManager) {
@@ -91,6 +94,7 @@ public class MainViewModel extends BaseObservable {
         });
         loadingVisibility.set(View.INVISIBLE);
         contentVisibility.set(true);
+        searchButtonActivated.set(false);
     }
 
     @BindingAdapter({"bind:visible"})
@@ -102,8 +106,13 @@ public class MainViewModel extends BaseObservable {
         } else if(!visible && view.getVisibility() == View.VISIBLE) {
             Animation fadeOut = AnimationUtils.loadAnimation(view.getContext(), android.R.anim.fade_out);
             fadeOut.setAnimationListener(new Animation.AnimationListener() {
-                @Override public void onAnimationStart(Animation animation) {}
-                @Override public void onAnimationRepeat(Animation animation) {}
+                @Override
+                public void onAnimationStart(Animation animation) {
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+                }
 
                 @Override
                 public void onAnimationEnd(Animation animation) {
@@ -114,9 +123,9 @@ public class MainViewModel extends BaseObservable {
         }
     }
 
-    @BindingAdapter({"bind:palette"})
-    public static void setPalette(final FloatingActionButton floatingActionButton, Palette palette) {
-        if(palette != null) {
+    @BindingAdapter({"bind:palette", "bind:activated"})
+    public static void setPalette(final FloatingActionButton floatingActionButton, Palette palette, final boolean activated) {
+        if(palette != null && activated) {
             final Palette.Swatch swatch = palette.getVibrantSwatch();
 
             if(floatingActionButton.getVisibility() != View.VISIBLE) {
