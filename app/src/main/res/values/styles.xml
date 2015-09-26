@@ -3,10 +3,11 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowTranslucentStatus">true</item>
-        <item name="android:colorPrimary">#009688</item>
-        <item name="android:colorPrimaryDark">#004D40</item>
-        <item name="android:colorAccent">@color/red</item>
-        <item name="colorAccent">@color/red</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:colorPrimary">@color/primary</item>
+        <item name="android:colorPrimaryDark">@color/primaryDark</item>
+
+        <item name="android:windowDrawsSystemBarBackgrounds">false</item>
 
         <!-- enable window content transitions -->
         <item name="android:windowContentTransitions">true</item>
@@ -14,6 +15,7 @@
         <!-- enable overlap of transitions -->
         <item name="android:windowAllowEnterTransitionOverlap">true</item>
         <item name="android:windowAllowReturnTransitionOverlap">true</item>
+        <item name="android:colorBackground">@color/background</item>
     </style>
 
 </resources>

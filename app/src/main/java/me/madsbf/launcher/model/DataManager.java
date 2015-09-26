@@ -4,22 +4,18 @@ import android.app.WallpaperManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.drawable.Drawable;
-import android.support.annotation.DrawableRes;
-import android.util.Log;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Observable;
 
 import me.madsbf.launcher.AppBroadcastReceiver;
 import me.madsbf.launcher.PackageChange;
 import me.madsbf.launcher.WallpaperBroadcastReceiver;
 import me.madsbf.launcher.model.entities.App;
-import rx.Observable;
 import rx.functions.Action1;
 import rx.subjects.BehaviorSubject;
 
@@ -32,13 +28,8 @@ public class DataManager {
         loadWallpaper(context, wallpaper);
         loadApps(context, apps);
 
-        AppBroadcastReceiver appReceiver = new AppBroadcastReceiver();
-        context.registerReceiver(appReceiver, new IntentFilter(Intent.ACTION_PACKAGE_ADDED));
-        context.registerReceiver(appReceiver, new IntentFilter(Intent.ACTION_PACKAGE_REMOVED));
-
         WallpaperBroadcastReceiver wallpaperReceiver = new WallpaperBroadcastReceiver();
         context.registerReceiver(wallpaperReceiver, new IntentFilter(Intent.ACTION_WALLPAPER_CHANGED));
-
         wallpaperReceiver.wallpaper.subscribe(new Action1<Drawable>() {
             @Override
             public void call(Drawable drawable) {
@@ -47,7 +38,10 @@ public class DataManager {
         });
 
         /*
-        receiver.packageChange.subscribe(new Action1<PackageChange>() {
+        AppBroadcastReceiver appReceiver = new AppBroadcastReceiver();
+        context.registerReceiver(appReceiver, new IntentFilter(Intent.ACTION_PACKAGE_ADDED));
+        context.registerReceiver(appReceiver, new IntentFilter(Intent.ACTION_PACKAGE_REMOVED));
+        appReceiver.packageChange.subscribe(new Action1<PackageChange>() {
             @Override
             public void call(PackageChange packageChange) {
                 PackageManager manager = context.getPackageManager();
@@ -57,8 +51,11 @@ public class DataManager {
                         break;
                     case Intent.ACTION_PACKAGE_REMOVED:
                         for(String packageName : packages) {
-                            for(App app : apps) {
-
+                            for(int i = 0; i < apps.toList().; i++) {
+                                if(apps.get(i).getPackageName().equals(packageName)) {
+                                    apps.remove(i);
+                                    i--;
+                                }
                             }
                         }
                         break;
@@ -78,18 +75,24 @@ public class DataManager {
         i.addCategory(Intent.CATEGORY_LAUNCHER);
         List<ResolveInfo> availableActivities = manager.queryIntentActivities(i, 0);
 
+        AppRater appRater = new AppRater(manager);
+        List<ResolveInfo> bestResolves = appRater.getBestResolveInfos(availableActivities, 8);
+
+        for(ResolveInfo info : bestResolves) {
+            apps.onNext(initApp(info, manager));
+        }
+
         Collections.sort(availableActivities, new ResolveInfo.DisplayNameComparator(manager));
 
         for(ResolveInfo info : availableActivities) {
-            String title = info.loadLabel(manager).toString();
-            String packageName = info.activityInfo.packageName;
-            Drawable icon = info.activityInfo.loadIcon(manager);
-            apps.onNext(new App(title, packageName, icon));
-            try {
-                Thread.sleep(10l);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            apps.onNext(initApp(info, manager));
         }
+    }
+
+    private App initApp(ResolveInfo info, PackageManager manager) {
+        String title = info.loadLabel(manager).toString();
+        String packageName = info.activityInfo.packageName;
+        Drawable icon = info.activityInfo.loadIcon(manager);
+        return new App(title, packageName, icon);
     }
 }

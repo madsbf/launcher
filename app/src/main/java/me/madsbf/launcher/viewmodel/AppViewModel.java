@@ -4,13 +4,13 @@ import android.animation.Animator;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.ColorStateList;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
 import android.databinding.Observable;
 import android.databinding.ObservableBoolean;
 import android.databinding.ObservableField;
+import android.databinding.ObservableInt;
 import android.databinding.ViewDataBinding;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -18,19 +18,16 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.graphics.ColorUtils;
 import android.support.v7.graphics.Palette;
-import android.util.TypedValue;
 import android.view.View;
-import android.view.ViewPropertyAnimator;
 import android.view.animation.AccelerateDecelerateInterpolator;
-import android.widget.TextView;
 
 import dk.shape.library.collections.OnBindListener;
+import me.madsbf.launcher.PaletteUtils;
 import me.madsbf.launcher.model.entities.App;
+import me.madsbf.launcher.utils.AnimationUtils;
 
 public class AppViewModel extends BaseObservable implements OnBindListener {
 
@@ -38,13 +35,22 @@ public class AppViewModel extends BaseObservable implements OnBindListener {
     public final ObservableField<Drawable> icon = new ObservableField<>();
 
     @Bindable
-    public final ObservableField<Palette.Swatch> iconSwatch = new ObservableField<>();
+    public final ObservableInt textColor = new ObservableInt(Color.parseColor("#aaaaaa"));
 
     @Bindable
     public final ObservableField<String> title = new ObservableField<>();
 
     @Bindable
     public final ObservableField<State> state = new ObservableField<>();
+
+    @Bindable
+    public final ObservableInt overlayVisibility = new ObservableInt(View.INVISIBLE);
+
+    @Bindable
+    public final ObservableBoolean lifted = new ObservableBoolean(false);
+
+    @Bindable
+    public final ObservableBoolean showDelete = new ObservableBoolean();
 
     final App app;
 
@@ -53,36 +59,14 @@ public class AppViewModel extends BaseObservable implements OnBindListener {
         icon.addOnPropertyChangedCallback(new OnPropertyChangedCallback() {
             @Override
             public void onPropertyChanged(Observable sender, int propertyId) {
-                new AsyncTask<Void, Void, Palette.Swatch>() {
-                    @Override
-                    protected Palette.Swatch doInBackground(Void... params) {
-                        Bitmap bitmap = ((BitmapDrawable) icon.get()).getBitmap();
-                        Palette palette = Palette.from(bitmap).generate();
-                        Palette.Swatch swatch = palette.getLightVibrantSwatch();
-                        if(swatch == null) {
-                            swatch = palette.getLightMutedSwatch();
-                            if(swatch == null) {
-                                swatch = palette.getVibrantSwatch();
-                                if(swatch == null) {
-                                    swatch = palette.getMutedSwatch();
-                                    if(swatch == null) {
-                                        swatch = palette.getDarkVibrantSwatch();
-                                        if(swatch == null) {
-                                            swatch = palette.getDarkMutedSwatch();
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        return swatch;
-                    }
+                updatePalette((BitmapDrawable) icon.get());
+            }
+        });
 
-                    @Override
-                    protected void onPostExecute(Palette.Swatch swatch) {
-                        super.onPostExecute(swatch);
-                        AppViewModel.this.iconSwatch.set(swatch);
-                    }
-                }.execute();
+        state.addOnPropertyChangedCallback(new OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable sender, int propertyId) {
+                switchState(state.get());
             }
         });
 
@@ -91,111 +75,53 @@ public class AppViewModel extends BaseObservable implements OnBindListener {
         state.set(State.NORMAL);
     }
 
-    @BindingAdapter({"bind:textSwatch"})
-    public static void setTextSwatch(final TextView view, Palette.Swatch swatch) {
-        if(swatch != null) {
-            view.setTextColor(swatch.getRgb());
-        }
-    }
-
-    @BindingAdapter({"bind:iconSwatch"})
-    public static void setSwatch(final View view, Palette.Swatch swatch) {
-        /*
-        if(swatch != null) {
-            view.setBackgroundColor(ColorUtils.setAlphaComponent(swatch.getRgb(), 35));
-        } else {
-            view.setBackgroundColor(Color.parseColor("#ffffff"));
-        }
-        */
-    }
-
-    @BindingAdapter({"bind:state"})
-    public static void setState(final View view, State state) {
-        int zDp = 2;
-        float scale = 1;
-        if(state == State.LIFTED) {
-            zDp = 8;
-            scale = 1.04f;
-        }
-        float z = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, zDp, view.getContext().getResources().getDisplayMetrics());
-
-        if(view.getZ() != z) {
-            ViewPropertyAnimator animator = view.animate()
-                    .scaleX(scale)
-                    .scaleY(scale)
-                    .z(z)
-                    .setInterpolator(new AccelerateDecelerateInterpolator());
-        }
-    }
-
-    @BindingAdapter({"bind:overlayState"})
-    public static void setOverlayState(final View view, State state) {
-        final float alpha = state == State.DEACTIVATED ? 1 : 0;
-
-        if(view.getAlpha() != alpha) {
-            view.animate()
-                    .setInterpolator(new AccelerateDecelerateInterpolator())
-                    .setListener(new Animator.AnimatorListener() {
-                        @Override
-                        public void onAnimationStart(Animator animation) {
-                        }
-
-                        @Override
-                        public void onAnimationRepeat(Animator animation) {
-                        }
-
-                        @Override
-                        public void onAnimationCancel(Animator animation) {
-                        }
-
-                        @Override
-                        public void onAnimationEnd(Animator animation) {
-                            if (alpha == 0) {
-                                view.setVisibility(View.INVISIBLE);
-                            }
-                        }
-                    }).alpha(alpha);
-            view.setVisibility(View.VISIBLE);
-        }
-    }
-
-    @BindingAdapter({"bind:deleteState"})
-    public static void setDeleteState(final View view, State state) {
-        if(state == State.LIFTED) {
-            if(view.getScaleX() != 1) {
-                view.animate()
-                        .setInterpolator(new AccelerateDecelerateInterpolator())
-                        .setListener(new Animator.AnimatorListener() {
-                            @Override public void onAnimationStart(Animator animation) {}
-                            @Override public void onAnimationEnd(Animator animation) {}
-                            @Override public void onAnimationCancel(Animator animation) {}
-                            @Override public void onAnimationRepeat(Animator animation) {}
-                        }).scaleY(1).scaleX(1);
-                view.setVisibility(View.VISIBLE);
-            } else if(view.getVisibility() != View.VISIBLE) {
-                view.setVisibility(View.VISIBLE);
+    private void updatePalette(final BitmapDrawable drawable) {
+        new AsyncTask<Void, Void, Palette.Swatch>() {
+            @Override
+            protected Palette.Swatch doInBackground(Void... params) {
+                Bitmap bitmap = drawable.getBitmap();
+                Palette palette = Palette.from(bitmap).generate();
+                return PaletteUtils.getMostVibrantSwatch(palette);
             }
-        } else {
-            if(view.getScaleX() != 0 && view.getVisibility() == View.VISIBLE) {
-                view.animate()
-                        .setInterpolator(new AccelerateDecelerateInterpolator())
-                        .setListener(new Animator.AnimatorListener() {
-                            @Override public void onAnimationStart(Animator animation) {}
-                            @Override public void onAnimationCancel(Animator animation) {}
-                            @Override public void onAnimationRepeat(Animator animation) {}
 
-                            @Override
-                            public void onAnimationEnd(Animator animation) {
-                                view.setVisibility(View.INVISIBLE);
-                                animation.removeListener(this);
-                            }
-
-                        }).scaleY(0).scaleX(0).setInterpolator(new AccelerateDecelerateInterpolator());
-            } else if(view.getScaleX() != 0) {
-                view.setScaleX(0);
-                view.setScaleY(0);
+            @Override
+            protected void onPostExecute(Palette.Swatch swatch) {
+                super.onPostExecute(swatch);
+                AppViewModel.this.textColor.set(swatch.getRgb());
             }
+        }.execute();
+    }
+
+    private void switchState(State state) {
+        switch(state) {
+            case LIFTED:
+                overlayVisibility.set(View.INVISIBLE);
+                lifted.set(true);
+                showDelete.set(true);
+                break;
+            case NORMAL:
+                overlayVisibility.set(View.INVISIBLE);
+                lifted.set(false);
+                showDelete.set(false);
+                break;
+            case DEACTIVATED:
+                overlayVisibility.set(View.VISIBLE);
+                lifted.set(false);
+                showDelete.set(false);
+                break;
         }
+    }
+
+    @BindingAdapter({"bind:lifted"})
+    public static void setLifted(final View view, boolean lifted) {
+        AnimationUtils.setLift(view,
+                lifted ? 6 : 0,
+                lifted ? 1.04f : 1);
+    }
+
+    @BindingAdapter({"bind:show"})
+    public static void setShow(final View view, boolean show) {
+        AnimationUtils.showScaleAnimate(view, show);
     }
 
     public View.OnClickListener onClickApp()
@@ -238,6 +164,7 @@ public class AppViewModel extends BaseObservable implements OnBindListener {
         };
     }
 
+    // OnLongClick not working - see hack below
     public View.OnClickListener onLongClickApp()
     {
         return new View.OnClickListener()

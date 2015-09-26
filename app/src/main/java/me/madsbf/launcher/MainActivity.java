@@ -10,20 +10,19 @@ import android.databinding.DataBindingUtil;
 import android.databinding.Observable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.v4.view.GravityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.core.CrashlyticsCore;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import dk.shape.library.collections.adapters.RecyclerAdapter;
@@ -47,6 +46,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,
+                WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         super.onCreate(savedInstanceState);
         Fabric.with(this, new Crashlytics.Builder().core(new CrashlyticsCore.Builder().disabled(BuildConfig.DEBUG_MODE).build()).build());
 
@@ -154,8 +155,8 @@ public class MainActivity extends AppCompatActivity {
             }
         } else {
             AppWidgetHostView hostView = appWidgetHost.createView(getBaseContext(), appWidgetId, appWidgetInfo);
+            hostView.setZ(6);
             CoordinatorLayout.LayoutParams params = new CoordinatorLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            params.topMargin = getStatusBarHeight();
             hostView.setLayoutParams(params);
             hostView.setAppWidget(appWidgetId, appWidgetInfo);
 
@@ -180,6 +181,23 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         overridePendingTransition(R.anim.still_bottom, R.anim.slide_out_bottom);
         super.onResume();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        boolean animate = (intent.getFlags() & Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT) !=
+                Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT;
+        resetScrollPosition(animate);
+        super.onNewIntent(intent);
+    }
+
+    public void resetScrollPosition(boolean animate) {
+        if(animate) {
+            binding.recycler.smoothScrollToPosition(0);
+        } else {
+            binding.recycler.getLayoutManager().scrollToPosition(0);
+        }
+        binding.appBar.setExpanded(true, animate);
     }
 
     @Override
