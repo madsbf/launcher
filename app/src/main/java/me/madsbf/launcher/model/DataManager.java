@@ -10,11 +10,8 @@ import android.graphics.drawable.Drawable;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Observable;
 
-import me.madsbf.launcher.AppBroadcastReceiver;
-import me.madsbf.launcher.PackageChange;
-import me.madsbf.launcher.WallpaperBroadcastReceiver;
+import me.madsbf.launcher.model.receivers.WallpaperBroadcastReceiver;
 import me.madsbf.launcher.model.entities.App;
 import rx.functions.Action1;
 import rx.subjects.BehaviorSubject;

@@ -1,6 +1,5 @@
 package me.madsbf.launcher.viewmodel;
 
-import android.animation.Animator;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -22,12 +21,11 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.graphics.Palette;
 import android.view.View;
-import android.view.animation.AccelerateDecelerateInterpolator;
 
 import dk.shape.library.collections.OnBindListener;
-import me.madsbf.launcher.PaletteUtils;
+import me.madsbf.launcher.model.AppSwatch;
 import me.madsbf.launcher.model.entities.App;
-import me.madsbf.launcher.utils.AnimationUtils;
+import me.madsbf.launcher.view.utils.AnimationUtils;
 
 public class AppViewModel extends BaseObservable implements OnBindListener {
 
@@ -76,18 +74,18 @@ public class AppViewModel extends BaseObservable implements OnBindListener {
     }
 
     private void updatePalette(final BitmapDrawable drawable) {
-        new AsyncTask<Void, Void, Palette.Swatch>() {
+        new AsyncTask<Void, Void, AppSwatch>() {
             @Override
-            protected Palette.Swatch doInBackground(Void... params) {
+            protected AppSwatch doInBackground(Void... params) {
                 Bitmap bitmap = drawable.getBitmap();
                 Palette palette = Palette.from(bitmap).generate();
-                return PaletteUtils.getMostVibrantSwatch(palette);
+                return new AppSwatch(palette);
             }
 
             @Override
-            protected void onPostExecute(Palette.Swatch swatch) {
+            protected void onPostExecute(AppSwatch swatch) {
                 super.onPostExecute(swatch);
-                AppViewModel.this.textColor.set(swatch.getRgb());
+                AppViewModel.this.textColor.set(swatch.getTextColor());
             }
         }.execute();
     }

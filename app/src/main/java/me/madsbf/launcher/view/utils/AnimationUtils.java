@@ -1,4 +1,4 @@
-package me.madsbf.launcher.utils;
+package me.madsbf.launcher.view.utils;
 
 import android.animation.Animator;
 import android.view.View;
@@ -35,9 +35,17 @@ public class AnimationUtils {
                 view.animate()
                         .setInterpolator(interpolator)
                         .setListener(new Animator.AnimatorListener() {
-                            @Override public void onAnimationStart(Animator animation) {}
-                            @Override public void onAnimationCancel(Animator animation) {}
-                            @Override public void onAnimationRepeat(Animator animation) {}
+                            @Override
+                            public void onAnimationStart(Animator animation) {
+                            }
+
+                            @Override
+                            public void onAnimationCancel(Animator animation) {
+                            }
+
+                            @Override
+                            public void onAnimationRepeat(Animator animation) {
+                            }
 
                             @Override
                             public void onAnimationEnd(Animator animation) {

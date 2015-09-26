@@ -1,4 +1,4 @@
-package me.madsbf.launcher;
+package me.madsbf.launcher.model.receivers;
 
 import android.app.WallpaperManager;
 import android.content.BroadcastReceiver;

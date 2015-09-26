@@ -1,4 +1,4 @@
-package me.madsbf.launcher;
+package me.madsbf.launcher.view.utils;
 
 import android.support.v7.graphics.Palette;
 

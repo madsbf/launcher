@@ -1,38 +1,24 @@
 package me.madsbf.launcher.viewmodel;
 
-import android.animation.Animator;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
-import android.content.res.ColorStateList;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
 import android.databinding.Observable;
-import android.databinding.ObservableBoolean;
 import android.databinding.ObservableField;
-import android.databinding.ObservableInt;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.graphics.Palette;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
 
 import dk.shape.allanaction.EaseImageView;
-import dk.shape.allanaction.ImageAnimator;
-import me.madsbf.launcher.PaletteUtils;
 import me.madsbf.launcher.model.DataManager;
 import me.madsbf.launcher.model.MainSwatch;
 import rx.android.schedulers.AndroidSchedulers;
@@ -40,7 +26,7 @@ import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
-public class MainViewModel extends BaseObservable {
+public class TopBarViewModel extends BaseObservable {
 
     @Bindable
     public final ObservableField<Drawable> wallpaper = new ObservableField<>();
@@ -50,7 +36,7 @@ public class MainViewModel extends BaseObservable {
 
     final Context context;
 
-    public MainViewModel(Context context, DataManager dataManager) {
+    public TopBarViewModel(Context context, DataManager dataManager) {
         dataManager.wallpaper
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -77,14 +63,13 @@ public class MainViewModel extends BaseObservable {
                     protected MainSwatch doInBackground(Void... params) {
                         Bitmap bitmap = ((BitmapDrawable) wallpaper.get()).getBitmap();
                         Palette palette = Palette.from(bitmap).generate();
-                        Palette.Swatch swatch = PaletteUtils.getMostVibrantSwatch(palette);
-                        return new MainSwatch(swatch);
+                        return new MainSwatch(palette);
                     }
 
                     @Override
                     protected void onPostExecute(MainSwatch swatch) {
                         super.onPostExecute(swatch);
-                        MainViewModel.this.swatch.set(swatch);
+                        TopBarViewModel.this.swatch.set(swatch);
                     }
                 }.execute();
             }

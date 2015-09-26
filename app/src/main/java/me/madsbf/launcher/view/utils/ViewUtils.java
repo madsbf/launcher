@@ -1,4 +1,4 @@
-package me.madsbf.launcher.utils;
+package me.madsbf.launcher.view.utils;
 
 
 import android.content.Context;

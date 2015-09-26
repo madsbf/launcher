@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-        <variable name="viewModel" type="me.madsbf.launcher.viewmodel.MainViewModel"/>
+        <variable name="viewModel" type="me.madsbf.launcher.viewmodel.TopBarViewModel"/>
     </data>
 
     <android.support.design.widget.CoordinatorLayout
@@ -47,7 +47,7 @@
                         android:fitsSystemWindows="true"
                         app:animationDuration="3200"
                         android:scaleType="centerCrop"
-                        app:drawable="@{viewModel.image}"/>
+                        app:drawable="@{viewModel.wallpaper}"/>
                 </FrameLayout>
 
                 <android.support.v7.widget.Toolbar

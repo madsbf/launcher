@@ -1,11 +1,10 @@
-package me.madsbf.launcher;
+package me.madsbf.launcher.model.receivers;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import rx.Observable;
-import rx.Subscriber;
+import me.madsbf.launcher.model.PackageChange;
 import rx.subjects.BehaviorSubject;
 
 public class AppBroadcastReceiver extends BroadcastReceiver {

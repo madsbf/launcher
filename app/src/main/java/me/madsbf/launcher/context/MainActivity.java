@@ -1,4 +1,4 @@
-package me.madsbf.launcher;
+package me.madsbf.launcher.context;
 
 import android.appwidget.AppWidgetHost;
 import android.appwidget.AppWidgetHostView;
@@ -10,11 +10,9 @@ import android.databinding.DataBindingUtil;
 import android.databinding.Observable;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,18 +25,20 @@ import java.util.List;
 
 import dk.shape.library.collections.adapters.RecyclerAdapter;
 import io.fabric.sdk.android.Fabric;
+import me.madsbf.launcher.BuildConfig;
+import me.madsbf.launcher.R;
 import me.madsbf.launcher.databinding.ActivityMainBinding;
 import me.madsbf.launcher.model.DataManager;
 import me.madsbf.launcher.model.entities.App;
 import me.madsbf.launcher.viewmodel.AppViewModel;
-import me.madsbf.launcher.viewmodel.MainViewModel;
+import me.madsbf.launcher.viewmodel.TopBarViewModel;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity {
 
-    MainViewModel mainViewModel;
+    TopBarViewModel mainViewModel;
     DataManager dataManager;
     ActivityMainBinding binding;
     AppWidgetHost appWidgetHost;
@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
         setupAppWidget((ViewGroup) binding.getRoot());
 
         dataManager = new DataManager();
-        mainViewModel = new MainViewModel(this, dataManager);
+        mainViewModel = new TopBarViewModel(this, dataManager);
         binding.setViewModel(mainViewModel);
 
         final RecyclerAdapter<AppViewModel> recyclerAdapter = new RecyclerAdapter<>();
@@ -151,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivityForResult(bindIntent, 1);
                 permissionTried = true;
             } else {
-                mainViewModel.searchButtonActivated.set(true);
+                // TODO: Error, no google search widget
             }
         } else {
             AppWidgetHostView hostView = appWidgetHost.createView(getBaseContext(), appWidgetId, appWidgetInfo);
