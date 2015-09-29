@@ -1,6 +1,7 @@
 package me.madsbf.launcher.viewmodel;
 
 import android.app.Activity;
+import android.appwidget.AppWidgetHost;
 import android.content.Context;
 import android.content.Intent;
 import android.databinding.BaseObservable;
@@ -17,16 +18,21 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.graphics.Palette;
 import android.view.View;
+import android.view.ViewGroup;
 
 import dk.shape.allanaction.EaseImageView;
+import dk.shape.library.collections.OnBindListener;
+import me.madsbf.launcher.SearchWidgetController;
+import me.madsbf.launcher.context.MainActivity;
+import me.madsbf.launcher.databinding.MainTopBarBinding;
 import me.madsbf.launcher.model.DataManager;
-import me.madsbf.launcher.model.MainSwatch;
+import me.madsbf.launcher.model.entities.MainSwatch;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
-public class TopBarViewModel extends BaseObservable {
+public class TopBarViewModel extends BaseObservable implements OnBindListener<MainTopBarBinding>, MainActivity.MainInterface, MainActivity.ResultInterface {
 
     @Bindable
     public final ObservableField<Drawable> wallpaper = new ObservableField<>();
@@ -35,8 +41,11 @@ public class TopBarViewModel extends BaseObservable {
     public final ObservableField<MainSwatch> swatch = new ObservableField<>();
 
     final Context context;
+    final SearchWidgetController searchWidgetController;
 
-    public TopBarViewModel(Context context, DataManager dataManager) {
+    public TopBarViewModel(MainActivity context, DataManager dataManager) {
+        searchWidgetController = new SearchWidgetController(context);
+
         dataManager.wallpaper
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -107,5 +116,43 @@ public class TopBarViewModel extends BaseObservable {
                         options.toBundle());
             }
         };
+    }
+
+    @Override
+    public void onStart() {
+        searchWidgetController.startListening();
+    }
+
+    @Override
+    public void onStop() {
+        searchWidgetController.stopListening();
+    }
+
+    @Override
+    public void onHomePressed(boolean fromOutside) {
+        setExpanded(true, !fromOutside);
+    }
+
+    @Override
+    public void onResult(int requestCode, int resultCode, Intent data) {
+        searchWidgetController.addAppWidget((ViewGroup) binding.getRoot().getParent());
+    }
+
+    //
+    // Two way binding
+    //
+
+    MainTopBarBinding binding;
+
+    @Override
+    public void onBind(MainTopBarBinding binding) throws BindingException {
+        this.binding = binding;
+        searchWidgetController.addAppWidget((ViewGroup) binding.getRoot().getParent());
+    }
+
+    private void setExpanded(boolean expanded, boolean animate) {
+        if(binding != null) {
+            binding.appBar.setExpanded(expanded, animate);
+        }
     }
 }

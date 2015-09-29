@@ -1,4 +1,4 @@
-package me.madsbf.launcher.model
+package me.madsbf.launcher.model.entities
 
 import android.graphics.Color
 import android.support.v4.graphics.ColorUtils

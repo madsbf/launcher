@@ -1,4 +1,4 @@
-package me.madsbf.launcher.model
+package me.madsbf.launcher.model.entities
 
 import android.support.v7.graphics.Palette
 import me.madsbf.launcher.view.utils.PaletteUtils

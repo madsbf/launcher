@@ -17,13 +17,15 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.graphics.Palette;
 import android.view.View;
+import android.widget.ImageView;
 
 import dk.shape.library.collections.OnBindListener;
-import me.madsbf.launcher.model.AppSwatch;
+import me.madsbf.launcher.model.entities.AppSwatch;
 import me.madsbf.launcher.model.entities.App;
 import me.madsbf.launcher.view.utils.AnimationUtils;
 
@@ -48,7 +50,7 @@ public class AppViewModel extends BaseObservable implements OnBindListener {
     public final ObservableBoolean lifted = new ObservableBoolean(false);
 
     @Bindable
-    public final ObservableBoolean showDelete = new ObservableBoolean();
+    public final ObservableBoolean showActions = new ObservableBoolean();
 
     final App app;
 
@@ -95,17 +97,17 @@ public class AppViewModel extends BaseObservable implements OnBindListener {
             case LIFTED:
                 overlayVisibility.set(View.INVISIBLE);
                 lifted.set(true);
-                showDelete.set(true);
+                showActions.set(true);
                 break;
             case NORMAL:
                 overlayVisibility.set(View.INVISIBLE);
                 lifted.set(false);
-                showDelete.set(false);
+                showActions.set(false);
                 break;
             case DEACTIVATED:
                 overlayVisibility.set(View.VISIBLE);
                 lifted.set(false);
-                showDelete.set(false);
+                showActions.set(false);
                 break;
         }
     }
@@ -146,6 +148,11 @@ public class AppViewModel extends BaseObservable implements OnBindListener {
         };
     }
 
+    @BindingAdapter({"android:src"})
+    public static void setImageDrawable(ImageView imageView, Drawable drawable) {
+        imageView.setImageDrawable(drawable);
+    }
+
     public View.OnClickListener onClickDelete()
     {
         return new View.OnClickListener()
@@ -157,6 +164,22 @@ public class AppViewModel extends BaseObservable implements OnBindListener {
                 Intent uninstallIntent =
                         new Intent(Intent.ACTION_UNINSTALL_PACKAGE, packageUri);
                 v.getContext().startActivity(uninstallIntent);
+                state.set(State.NORMAL);
+            }
+        };
+    }
+
+    public View.OnClickListener onClickDetails()
+    {
+        return new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                Uri packageUri = Uri.parse("package:" + app.getPackageName());
+                Intent detailsIntent =
+                        new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, packageUri);
+                v.getContext().startActivity(detailsIntent);
                 state.set(State.NORMAL);
             }
         };

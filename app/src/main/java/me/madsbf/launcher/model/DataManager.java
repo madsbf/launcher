@@ -1,5 +1,6 @@
 package me.madsbf.launcher.model;
 
+import android.app.ActivityManager;
 import android.app.WallpaperManager;
 import android.content.Context;
 import android.content.Intent;
@@ -68,11 +69,12 @@ public class DataManager {
 
     private void loadApps(Context context, BehaviorSubject<App> apps) {
         PackageManager manager = context.getPackageManager();
+        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         Intent i = new Intent(Intent.ACTION_MAIN, null);
         i.addCategory(Intent.CATEGORY_LAUNCHER);
         List<ResolveInfo> availableActivities = manager.queryIntentActivities(i, 0);
 
-        AppRater appRater = new AppRater(manager);
+        AppRater appRater = new AppRater(manager, activityManager);
         List<ResolveInfo> bestResolves = appRater.getBestResolveInfos(availableActivities, 8);
 
         for(ResolveInfo info : bestResolves) {

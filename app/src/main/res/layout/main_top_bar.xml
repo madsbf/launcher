@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-        <variable name="viewModel" type="me.madsbf.launcher.viewmodel.TopBarViewModel"/>
+        <variable name="topBarViewModel" type="me.madsbf.launcher.viewmodel.TopBarViewModel"/>
     </data>
 
     <android.support.design.widget.AppBarLayout
@@ -16,14 +16,14 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fitsSystemWindows="true"
-            app:swatch="@{viewModel.swatch}"
+            app:swatch="@{topBarViewModel.swatch}"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:fitsSystemWindows="true"
-                android:onClick="@{viewModel.onClickImage}"
+                android:onClick="@{topBarViewModel.onClickImage}"
                 android:foreground="?android:attr/selectableItemBackground"
                 android:background="#f7f7f7"
                 app:layout_collapseMode="parallax">
@@ -33,7 +33,7 @@
                     android:fitsSystemWindows="true"
                     app:animationDuration="3200"
                     android:scaleType="centerCrop"
-                    app:drawable="@{viewModel.wallpaper}"/>
+                    app:drawable="@{topBarViewModel.wallpaper}"/>
             </FrameLayout>
 
             <android.support.v7.widget.Toolbar

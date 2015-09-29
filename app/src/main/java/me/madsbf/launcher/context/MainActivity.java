@@ -1,48 +1,33 @@
 package me.madsbf.launcher.context;
 
-import android.appwidget.AppWidgetHost;
-import android.appwidget.AppWidgetHostView;
-import android.appwidget.AppWidgetManager;
-import android.appwidget.AppWidgetProviderInfo;
-import android.content.ComponentName;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
-import android.databinding.Observable;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.GridLayoutManager;
-import android.util.Log;
-import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.core.CrashlyticsCore;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import dk.shape.library.collections.adapters.RecyclerAdapter;
+import dk.shape.library.collections.OnBindListener;
 import io.fabric.sdk.android.Fabric;
 import me.madsbf.launcher.BuildConfig;
 import me.madsbf.launcher.R;
 import me.madsbf.launcher.databinding.ActivityMainBinding;
 import me.madsbf.launcher.model.DataManager;
-import me.madsbf.launcher.model.entities.App;
-import me.madsbf.launcher.viewmodel.AppViewModel;
+import me.madsbf.launcher.viewmodel.AppsViewModel;
 import me.madsbf.launcher.viewmodel.TopBarViewModel;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
-import rx.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity {
 
-    TopBarViewModel mainViewModel;
     DataManager dataManager;
     ActivityMainBinding binding;
-    AppWidgetHost appWidgetHost;
-    boolean permissionTried = false;
+    List<MainInterface> mainInterfaces = new ArrayList<>();
+    List<ResultInterface> resultInterfaces = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,51 +38,22 @@ public class MainActivity extends AppCompatActivity {
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
-        setupAppWidget((ViewGroup) binding.getRoot());
-
         dataManager = new DataManager();
-        mainViewModel = new TopBarViewModel(this, dataManager);
-        binding.setViewModel(mainViewModel);
 
-        final RecyclerAdapter<AppViewModel> recyclerAdapter = new RecyclerAdapter<>();
-        binding.recycler.setAdapter(recyclerAdapter);
-        binding.recycler.setLayoutManager(new GridLayoutManager(MainActivity.this, 4));
-        binding.recycler.setOnScrollChangeListener(new View.OnScrollChangeListener() {
-            @Override
-            public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-                recyclerAdapter.getItem(0).getViewModel().state.set(AppViewModel.State.NORMAL);
-            }
-        });
+        try {
+            TopBarViewModel topBarViewModel = new TopBarViewModel(this, dataManager);
+            binding.setTopBarViewModel(topBarViewModel);
+            addMainInterface(topBarViewModel);
+            addResultInterface(topBarViewModel);
+            topBarViewModel.onBind(binding.topBar);
 
-        dataManager.apps
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<App>() {
-                    @Override
-                    public void call(App app) {
-                        final AppViewModel appViewModel = new AppViewModel(app);
-                        appViewModel.state.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
-                            @Override
-                            public void onPropertyChanged(Observable sender, int propertyId) {
-                                for (int j = 0; j < recyclerAdapter.getItemCount(); j++) {
-                                    if (!appViewModel.title.get().equals(recyclerAdapter.getItem(j).getViewModel().title.get())) {
-                                        switch (appViewModel.state.get()) {
-                                            case LIFTED:
-                                                recyclerAdapter.getItem(j).getViewModel().state.set(AppViewModel.State.DEACTIVATED);
-                                                break;
-                                            case NORMAL:
-                                                recyclerAdapter.getItem(j).getViewModel().state.set(AppViewModel.State.NORMAL);
-                                                break;
-                                        }
-                                    }
-                                }
-                            }
-                        });
+            AppsViewModel appsViewModel = new AppsViewModel(this, dataManager);
+            binding.setAppsViewModel(appsViewModel);
+            addMainInterface(appsViewModel);
+            appsViewModel.onBind(binding.apps);
+        } catch (OnBindListener.BindingException e) {}
 
-                        recyclerAdapter.add(appViewModel, R.layout.item_app, me.madsbf.launcher.BR.appViewModel);
-                        recyclerAdapter.notifyItemInserted(recyclerAdapter.getItemCount() - 1);
-                    }
-                });
+
 
         new AsyncTask<Void, Void, Void>() {
             @Override
@@ -108,73 +64,10 @@ public class MainActivity extends AppCompatActivity {
         }.execute();
     }
 
-    private void setupAppWidget(ViewGroup root) {
-        //create ComponentName for accesing the widget provider
-        //ComponentName cn = new ComponentName("com.android.quicksearchbox", "com.android.quicksearchbox.SearchWidgetProvider");
-        ComponentName cn = new ComponentName("com.google.android.googlequicksearchbox", "com.google.android.googlequicksearchbox.SearchWidgetProvider");
-        //ComponentName cn = new ComponentName("com.android.music", "com.android.music.MediaAppWidgetProvider");
-
-        //get appWidgetManager instance
-        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(getBaseContext());
-        appWidgetHost = new AppWidgetHost(this, 1230);
-        //get list of the providers - .getAppWidgetIds (cn) does seem to be unrelated to widget hosting and more related to widget development
-        final List<AppWidgetProviderInfo> infos = appWidgetManager.getInstalledProviders();
-
-        //get AppWidgetProviderInfo
-        AppWidgetProviderInfo appWidgetInfo = null;
-        //just in case you want to see all package and class names of installed widget providers, this code is useful
-        for (final AppWidgetProviderInfo info : infos) {
-            Log.v("AD3", info.provider.getPackageName() + " / "
-                    + info.provider.getClassName());
-        }
-        //iterate through all infos, trying to find the desired one
-        for (final AppWidgetProviderInfo info : infos) {
-            if (info.provider.getClassName().equals(cn.getClassName()) && info.provider.getPackageName().equals(cn.getPackageName())) {
-                //we found it
-                appWidgetInfo = info;
-                break;
-            }
-        }
-        if (appWidgetInfo == null)
-            return; //stop here
-
-        //allocate the hosted widget id
-        int appWidgetId = appWidgetHost.allocateAppWidgetId();
-
-        //bind the id and the componentname - here's the problem!!!
-        boolean success = appWidgetManager.bindAppWidgetIdIfAllowed(appWidgetId, cn);
-        if(!success) {
-            if(!permissionTried) {
-                Intent bindIntent = new Intent(AppWidgetManager.ACTION_APPWIDGET_BIND);
-                bindIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-                bindIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_PROVIDER, cn);
-                startActivityForResult(bindIntent, 1);
-                permissionTried = true;
-            } else {
-                // TODO: Error, no google search widget
-            }
-        } else {
-            AppWidgetHostView hostView = appWidgetHost.createView(getBaseContext(), appWidgetId, appWidgetInfo);
-            hostView.setZ(6);
-            CoordinatorLayout.LayoutParams params = new CoordinatorLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            hostView.setLayoutParams(params);
-            hostView.setAppWidget(appWidgetId, appWidgetInfo);
-
-            root.addView(hostView);
-        }
-    }
-
-    private int getStatusBarHeight() {
-        int result = 0;
-        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
-        if (resourceId > 0) {
-            result = getResources().getDimensionPixelSize(resourceId);
-        }
-        return result;
-    }
-
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        setupAppWidget((ViewGroup) binding.getRoot());
+        for(ResultInterface resultInterface : resultInterfaces) {
+            resultInterface.onResult(requestCode, resultCode, data);
+        }
     }
 
     @Override
@@ -185,32 +78,43 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onNewIntent(Intent intent) {
-        boolean animate = (intent.getFlags() & Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT) !=
-                Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT;
-        resetScrollPosition(animate);
+        boolean fromOutside = (intent.getFlags() & Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT) == Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT;
+        for(MainInterface mainInterface : mainInterfaces) {
+            mainInterface.onHomePressed(fromOutside);
+        }
         super.onNewIntent(intent);
     }
-
-    public void resetScrollPosition(boolean animate) {
-        if(animate) {
-            binding.recycler.smoothScrollToPosition(0);
-        } else {
-            binding.recycler.getLayoutManager().scrollToPosition(0);
-        }
-        binding.appBar.setExpanded(true, animate);
-    }
-
-    @Override
-    public void onBackPressed() {}
 
     @Override
     protected void onStart() {
         super.onStart();
-        appWidgetHost.startListening();
+        for(MainInterface mainInterface : mainInterfaces) {
+            mainInterface.onStart();
+        }
     }
     @Override
     protected void onStop() {
         super.onStop();
-        appWidgetHost.stopListening();
+        for(MainInterface mainInterface : mainInterfaces) {
+            mainInterface.onStop();
+        }
+    }
+
+    public void addMainInterface(MainInterface mainInterface) {
+        mainInterfaces.add(mainInterface);
+    }
+
+    public void addResultInterface(ResultInterface resultInterface) {
+        resultInterfaces.add(resultInterface);
+    }
+
+    public interface MainInterface {
+        void onStart();
+        void onStop();
+        void onHomePressed(boolean fromOutside);
+    }
+
+    public interface ResultInterface {
+        void onResult(int requestCode, int resultCode, Intent data);
     }
 }
