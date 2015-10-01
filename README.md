@@ -1,2 +1,1 @@
-# launcher
-Launcher app for Android
+![](http://i.imgur.com/1WryfjC.png)
