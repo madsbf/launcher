@@ -28,6 +28,8 @@ import dk.shape.library.collections.OnBindListener;
 import me.madsbf.launcher.model.entities.AppSwatch;
 import me.madsbf.launcher.model.entities.App;
 import me.madsbf.launcher.view.utils.AnimationUtils;
+import rx.functions.Action1;
+import rx.subjects.BehaviorSubject;
 
 public class AppViewModel extends BaseObservable implements OnBindListener {
 
@@ -70,8 +72,8 @@ public class AppViewModel extends BaseObservable implements OnBindListener {
             }
         });
 
-        icon.set(app.getIcon());
-        title.set(app.getTitle());
+        icon.set(this.app.getIcon());
+        title.set(this.app.getTitle());
         state.set(State.NORMAL);
     }
 

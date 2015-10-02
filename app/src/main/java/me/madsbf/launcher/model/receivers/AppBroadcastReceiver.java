@@ -13,6 +13,6 @@ public class AppBroadcastReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        packageChange.onNext(new PackageChange(intent.getIntExtra(Intent.EXTRA_UID, -1), intent.getAction()));
+        packageChange.onNext(new PackageChange(intent.getIntExtra(Intent.EXTRA_UID, -1), intent.getData().getSchemeSpecificPart(), intent.getAction()));
     }
 }

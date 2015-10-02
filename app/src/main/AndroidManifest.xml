@@ -24,13 +24,6 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".model.receivers.AppBroadcastReceiver" >
-            <intent-filter>
-                <action android:name="android.intent.action.PACKAGE_ADDED"/>
-                <action android:name="android.intent.action.PACKAGE_REMOVED"/>
-            </intent-filter>
-        </receiver>
-
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="bcc6e6fae7623f1fe1446fc3395efa22c0377e18" />

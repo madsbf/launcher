@@ -12,6 +12,8 @@ import android.graphics.drawable.Drawable;
 import java.util.Collections;
 import java.util.List;
 
+import me.madsbf.launcher.model.entities.PackageChange;
+import me.madsbf.launcher.model.receivers.AppBroadcastReceiver;
 import me.madsbf.launcher.model.receivers.WallpaperBroadcastReceiver;
 import me.madsbf.launcher.model.entities.App;
 import rx.functions.Action1;
@@ -19,7 +21,7 @@ import rx.subjects.BehaviorSubject;
 
 public class DataManager {
 
-    public final BehaviorSubject<App> apps = BehaviorSubject.create();
+    public final BehaviorSubject<BehaviorSubject<App>> apps = BehaviorSubject.create();
     public final BehaviorSubject<Drawable> wallpaper = BehaviorSubject.create();
 
     public void initialize(final Context context) {
@@ -35,24 +37,29 @@ public class DataManager {
             }
         });
 
-        /*
         AppBroadcastReceiver appReceiver = new AppBroadcastReceiver();
-        context.registerReceiver(appReceiver, new IntentFilter(Intent.ACTION_PACKAGE_ADDED));
-        context.registerReceiver(appReceiver, new IntentFilter(Intent.ACTION_PACKAGE_REMOVED));
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Intent.ACTION_PACKAGE_REMOVED);
+        filter.addAction(Intent.ACTION_PACKAGE_ADDED);
+        filter.addDataScheme("package");
+        context.registerReceiver(appReceiver, filter);
         appReceiver.packageChange.subscribe(new Action1<PackageChange>() {
             @Override
             public void call(PackageChange packageChange) {
                 PackageManager manager = context.getPackageManager();
-                String[] packages = manager.getPackagesForUid(packageChange.uid);
-                switch(packageChange.event) {
+                switch(packageChange.getEvent()) {
                     case Intent.ACTION_PACKAGE_ADDED:
+                        Intent intent = manager.getLaunchIntentForPackage(packageChange.getPackageName());
+                        ResolveInfo info = manager.resolveActivity(intent, PackageManager.MATCH_ALL);
+                        apps.onNext(BehaviorSubject.create(initApp(info, manager)));
                         break;
                     case Intent.ACTION_PACKAGE_REMOVED:
-                        for(String packageName : packages) {
-                            for(int i = 0; i < apps.toList().; i++) {
-                                if(apps.get(i).getPackageName().equals(packageName)) {
-                                    apps.remove(i);
-                                    i--;
+                        Object[] values = apps.getValues();
+                        for(Object o : values) {
+                            if(o != null && o instanceof BehaviorSubject) {
+                                BehaviorSubject<App> appSubject = (BehaviorSubject<App>) o;
+                                if(appSubject.getValue().getPackageName().equals(packageChange.getPackageName())) {
+                                    appSubject.onNext(null);
                                 }
                             }
                         }
@@ -60,14 +67,13 @@ public class DataManager {
                 }
             }
         });
-        */
     }
 
     public void loadWallpaper(Context context, BehaviorSubject<Drawable> wallpaper) {
         wallpaper.onNext(WallpaperManager.getInstance(context).getDrawable());
     }
 
-    private void loadApps(Context context, BehaviorSubject<App> apps) {
+    private void loadApps(Context context, BehaviorSubject<BehaviorSubject<App>> apps) {
         PackageManager manager = context.getPackageManager();
         ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         Intent i = new Intent(Intent.ACTION_MAIN, null);
@@ -78,13 +84,13 @@ public class DataManager {
         List<ResolveInfo> bestResolves = appRater.getBestResolveInfos(availableActivities, 8);
 
         for(ResolveInfo info : bestResolves) {
-            apps.onNext(initApp(info, manager));
+            apps.onNext(BehaviorSubject.create(initApp(info, manager)));
         }
 
         Collections.sort(availableActivities, new ResolveInfo.DisplayNameComparator(manager));
 
         for(ResolveInfo info : availableActivities) {
-            apps.onNext(initApp(info, manager));
+            apps.onNext(BehaviorSubject.create(initApp(info, manager)));
         }
     }
 

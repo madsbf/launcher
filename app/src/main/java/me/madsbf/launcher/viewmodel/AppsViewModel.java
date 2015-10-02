@@ -10,6 +10,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
+import dk.shape.library.collections.AdapterEntity;
 import dk.shape.library.collections.OnBindListener;
 import dk.shape.library.collections.adapters.RecyclerAdapter;
 import me.madsbf.launcher.R;
@@ -22,6 +23,7 @@ import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 import me.madsbf.launcher.BR;
+import rx.subjects.BehaviorSubject;
 
 public class AppsViewModel extends BaseObservable implements OnBindListener<MainAppsBinding>, MainActivity.MainInterface {
 
@@ -42,21 +44,21 @@ public class AppsViewModel extends BaseObservable implements OnBindListener<Main
                 .onBackpressureBuffer()
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<App>() {
+                .subscribe(new Action1<BehaviorSubject<App>>() {
                     @Override
-                    public void call(App app) {
-                        final AppViewModel appViewModel = new AppViewModel(app);
+                    public void call(BehaviorSubject<App> app) {
+                        final AppViewModel appViewModel = new AppViewModel(app.getValue());
                         appViewModel.state.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
                             @Override
                             public void onPropertyChanged(Observable sender, int propertyId) {
                                 for (int j = 0; j < adapter.get().getItemCount(); j++) {
-                                    if (!appViewModel.title.get().equals(adapter.get().getItem(j).getViewModel().title.get())) {
+                                    if (!appViewModel.title.get().equals(adapter.get().getItem(j).title.get())) {
                                         switch (appViewModel.state.get()) {
                                             case LIFTED:
-                                                adapter.get().getItem(j).getViewModel().state.set(AppViewModel.State.DEACTIVATED);
+                                                adapter.get().getItem(j).state.set(AppViewModel.State.DEACTIVATED);
                                                 break;
                                             case NORMAL:
-                                                adapter.get().getItem(j).getViewModel().state.set(AppViewModel.State.NORMAL);
+                                                adapter.get().getItem(j).state.set(AppViewModel.State.NORMAL);
                                                 break;
                                         }
                                     }
@@ -66,6 +68,17 @@ public class AppsViewModel extends BaseObservable implements OnBindListener<Main
 
                         adapter.get().add(appViewModel, R.layout.item_app);
                         adapter.get().notifyItemInserted(adapter.get().getItemCount() - 1);
+
+                        app.subscribe(new Action1<App>() {
+                            @Override
+                            public void call(App app) {
+                                if(app == null) {
+                                    int index = adapter.get().indexOf(appViewModel);
+                                    adapter.get().remove(appViewModel);
+                                    adapter.get().notifyItemRemoved(index);
+                                }
+                            }
+                        });
                     }
                 });
 
@@ -91,7 +104,7 @@ public class AppsViewModel extends BaseObservable implements OnBindListener<Main
         return new View.OnScrollChangeListener() {
             @Override
             public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-                adapter.get().getItem(0).getViewModel().state.set(AppViewModel.State.NORMAL);
+                adapter.get().getItem(0).state.set(AppViewModel.State.NORMAL);
             }
         };
     }
