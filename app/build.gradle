@@ -67,7 +67,7 @@ dependencies {
     compile 'com.android.support:palette-v7:23.0.1'
     compile 'com.android.support:design:23.0.1'
     compile "com.android.support:support-v4:23.0.1"
-    compile 'dk.shape.library:SHPCollections:2.0.0-rc2'
+    compile 'dk.shape.library:SHPCollections:2.0.0-rc3'
     compile 'dk.shape.library:allanaction:1.0.0-alpha5'
     compile 'org.jetbrains.kotlin:kotlin-stdlib:0.12.1230'
     compile 'io.reactivex:rxandroid:1.0.1'

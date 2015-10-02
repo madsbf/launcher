@@ -64,7 +64,7 @@ public class AppsViewModel extends BaseObservable implements OnBindListener<Main
                             }
                         });
 
-                        adapter.get().add(appViewModel, R.layout.item_app, BR.appViewModel);
+                        adapter.get().add(appViewModel, R.layout.item_app);
                         adapter.get().notifyItemInserted(adapter.get().getItemCount() - 1);
                     }
                 });
