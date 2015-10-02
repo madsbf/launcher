@@ -83,9 +83,12 @@ public class DataManager {
         AppRater appRater = new AppRater(manager, activityManager);
         List<ResolveInfo> bestResolves = appRater.getBestResolveInfos(availableActivities, 8);
 
+        /*
         for(ResolveInfo info : bestResolves) {
             apps.onNext(BehaviorSubject.create(initApp(info, manager)));
         }
+
+        */
 
         Collections.sort(availableActivities, new ResolveInfo.DisplayNameComparator(manager));
 

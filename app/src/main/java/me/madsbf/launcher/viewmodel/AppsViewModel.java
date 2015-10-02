@@ -14,6 +14,7 @@ import dk.shape.library.collections.AdapterEntity;
 import dk.shape.library.collections.OnBindListener;
 import dk.shape.library.collections.adapters.RecyclerAdapter;
 import me.madsbf.launcher.R;
+import me.madsbf.launcher.SortedAppRecyclerAdapter;
 import me.madsbf.launcher.context.MainActivity;
 import me.madsbf.launcher.databinding.MainAppsBinding;
 import me.madsbf.launcher.model.DataManager;
@@ -31,14 +32,14 @@ public class AppsViewModel extends BaseObservable implements OnBindListener<Main
     public final ObservableField<RecyclerView.LayoutManager> layoutManager = new ObservableField<>();
 
     @Bindable
-    public final ObservableField<RecyclerAdapter<AppViewModel>> adapter = new ObservableField<>();
+    public final ObservableField<SortedAppRecyclerAdapter> adapter = new ObservableField<>();
 
     @Bindable
     public final ObservableField<View.OnScrollChangeListener> onScrollChanged = new ObservableField<>();
 
     public AppsViewModel(Context context, DataManager dataManager) {
         layoutManager.set(new GridLayoutManager(context, 4));
-        adapter.set(new RecyclerAdapter());
+        adapter.set(new SortedAppRecyclerAdapter());
 
         dataManager.apps
                 .onBackpressureBuffer()
@@ -66,8 +67,8 @@ public class AppsViewModel extends BaseObservable implements OnBindListener<Main
                             }
                         });
 
-                        adapter.get().add(appViewModel, R.layout.item_app);
-                        adapter.get().notifyItemInserted(adapter.get().getItemCount() - 1);
+                        int index = adapter.get().addSorted(appViewModel, R.layout.item_app);
+                        adapter.get().notifyItemInserted(index);
 
                         app.subscribe(new Action1<App>() {
                             @Override
