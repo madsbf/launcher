@@ -23,6 +23,7 @@ public class AnimationUtils {
         if(show) {
             if(view.getScaleX() != 1) {
                 view.animate()
+                        .setListener(null)
                         .setInterpolator(interpolator)
                         .scaleY(1)
                         .scaleX(1);
@@ -50,7 +51,6 @@ public class AnimationUtils {
                             @Override
                             public void onAnimationEnd(Animator animation) {
                                 view.setVisibility(View.INVISIBLE);
-                                animation.removeListener(this);
                             }
                         }).scaleY(0).scaleX(0).setInterpolator(interpolator);
             } else if(view.getScaleX() != 0) {
