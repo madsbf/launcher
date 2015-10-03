@@ -38,7 +38,7 @@
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_margin="8dp"
-                tools:src="@mipmap/ic_launcher"
+                tools:src="@mipmap/launcher_icon"
                 android:id="@+id/image"
                 android:src="@{appViewModel.icon}"/>
 

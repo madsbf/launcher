@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="TypographyDashes">
+
+    <string name="ga_trackingId">UA-68405433-1</string>
+    <string name="me.madsbf.launcher.context.MainActivity">Main Screen</string>
+</resources>
