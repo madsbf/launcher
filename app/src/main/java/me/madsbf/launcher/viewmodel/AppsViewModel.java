@@ -6,6 +6,7 @@ import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
 import android.databinding.Observable;
 import android.databinding.ObservableField;
+import android.databinding.ObservableInt;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -37,6 +38,9 @@ public class AppsViewModel extends BaseObservable implements OnBindListener<Main
     @Bindable
     public final ObservableField<View.OnScrollChangeListener> onScrollChanged = new ObservableField<>();
 
+    @Bindable
+    public final ObservableInt overlayVisibility = new ObservableInt(View.INVISIBLE);
+
     public AppsViewModel(Context context, DataManager dataManager) {
         layoutManager.set(new GridLayoutManager(context, 4));
         adapter.set(new SortedAppRecyclerAdapter());
@@ -47,11 +51,17 @@ public class AppsViewModel extends BaseObservable implements OnBindListener<Main
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Action1<BehaviorSubject<App>>() {
                     @Override
-                    public void call(BehaviorSubject<App> app) {
+                    public void call(final BehaviorSubject<App> app) {
                         final AppViewModel appViewModel = new AppViewModel(app.getValue());
                         appViewModel.state.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
                             @Override
                             public void onPropertyChanged(Observable sender, int propertyId) {
+                                if(appViewModel.state.get() == AppViewModel.State.NORMAL) {
+                                    overlayVisibility.set(View.INVISIBLE);
+                                } else {
+                                    overlayVisibility.set(View.VISIBLE);
+                                }
+
                                 for (int j = 0; j < adapter.get().getItemCount(); j++) {
                                     if (!appViewModel.title.get().equals(adapter.get().getItem(j).title.get())) {
                                         switch (appViewModel.state.get()) {

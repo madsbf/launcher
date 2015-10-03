@@ -6,14 +6,26 @@
         <variable name="appsViewModel" type="me.madsbf.launcher.viewmodel.AppsViewModel"/>
     </data>
 
-    <android.support.v7.widget.RecyclerView
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/recycler"
-        android:clipToPadding="false"
-        android:clipChildren="false"
-        app:onScrollChanged="@{appsViewModel.onScrollChanged}"
-        app:adapter="@{appsViewModel.adapter}"
-        app:layoutManager="@{appsViewModel.layoutManager}"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#20000000"
+            android:visibility="@{appsViewModel.overlayVisibility}"/>
+
+        <android.support.v7.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/recycler"
+            android:clipToPadding="false"
+            android:clipChildren="false"
+            app:onScrollChanged="@{appsViewModel.onScrollChanged}"
+            app:adapter="@{appsViewModel.adapter}"
+            app:layoutManager="@{appsViewModel.layoutManager}"/>
+    </FrameLayout>
+
 </layout>
