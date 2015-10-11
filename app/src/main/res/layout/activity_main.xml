@@ -10,16 +10,20 @@
     <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/coordinator"
-        android:fitsSystemWindows="true">
-
-        <include layout="@layout/main_apps"
-            android:id="@+id/apps"
-            tools:appsViewModel="@{appsViewModel}"/>
+        android:fitsSystemWindows="true"
+        android:id="@+id/coordinator">
 
         <include layout="@layout/main_top_bar"
             android:id="@+id/topBar"
             tools:topBarViewModel="@{topBarViewModel}"/>
+
+        <include layout="@layout/main_apps"
+            android:id="@+id/apps"
+            tools:appsViewModel="@{appsViewModel}"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:behavior_overlapTop="216dp"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
     </android.support.design.widget.CoordinatorLayout>
 </layout>

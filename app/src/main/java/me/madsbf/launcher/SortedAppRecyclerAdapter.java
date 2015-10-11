@@ -12,9 +12,9 @@ public class SortedAppRecyclerAdapter extends RecyclerAdapter<AppViewModel> {
     List<String> titles = new ArrayList<>();
 
     public int addSorted(AppViewModel item, int layoutResourceId) {
-        titles.add(item.title.get());
+        titles.add(item.title.get().toLowerCase());
         Collections.sort(titles);
-        int index = titles.indexOf(item.title.get());
+        int index = titles.indexOf(item.title.get().toLowerCase());
         super.add(index, item, layoutResourceId);
         return index;
     }

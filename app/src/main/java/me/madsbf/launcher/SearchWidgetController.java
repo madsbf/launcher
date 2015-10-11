@@ -14,6 +14,8 @@ import android.view.ViewGroup;
 
 import java.util.List;
 
+import me.madsbf.launcher.view.utils.ViewUtils;
+
 public class SearchWidgetController {
 
     final AppWidgetHost appWidgetHost;
@@ -56,8 +58,11 @@ public class SearchWidgetController {
             }
         } else {
             AppWidgetHostView hostView = appWidgetHost.createView(root.getContext(), appWidgetId, appWidgetInfo);
-            hostView.setZ(6);
+            hostView.setZ(ViewUtils.dpToPx(root.getContext(), 4));
             CoordinatorLayout.LayoutParams params = new CoordinatorLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            params.leftMargin = -Math.round(ViewUtils.dpToPx(root.getContext(), 8));
+            params.topMargin = -Math.round(ViewUtils.dpToPx(root.getContext(), 8));
+            params.rightMargin = -Math.round(ViewUtils.dpToPx(root.getContext(), 8));
             hostView.setLayoutParams(params);
             hostView.setAppWidget(appWidgetId, appWidgetInfo);
 

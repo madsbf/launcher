@@ -8,7 +8,7 @@
     </data>
 
     <android.support.design.widget.AppBarLayout
-        android:layout_height="430dp"
+        android:layout_height="match_parent"
         android:layout_width="match_parent"
         android:id="@+id/appBar"
         android:fitsSystemWindows="true">
@@ -26,7 +26,8 @@
                 android:onClick="@{topBarViewModel.onClickImage}"
                 android:foreground="?android:attr/selectableItemBackground"
                 android:background="#f7f7f7"
-                app:layout_collapseMode="parallax">
+                app:layout_collapseMode="parallax"
+                app:layout_collapseParallaxMultiplier="0.6">
                 <dk.shape.allanaction.EaseImageView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -37,7 +38,7 @@
             </FrameLayout>
 
             <android.support.v7.widget.Toolbar
-                android:layout_height="80dp"
+                android:layout_height="64dp"
                 android:layout_width="match_parent"
                 app:layout_collapseMode="pin"/>
         </android.support.design.widget.CollapsingToolbarLayout>
