@@ -18,4 +18,16 @@ public class SortedAppRecyclerAdapter extends RecyclerAdapter<AppViewModel> {
         super.add(index, item, layoutResourceId);
         return index;
     }
+
+    @Override
+    public void remove(AppViewModel item) {
+        super.remove(item);
+        titles.remove(indexOf(item));
+    }
+
+    @Override
+    public void remove(int position) {
+        super.remove(position);
+        titles.remove(position);
+    }
 }

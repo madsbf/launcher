@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.List;
 
 import me.madsbf.launcher.model.entities.PackageChange;
+import me.madsbf.launcher.model.rating.AppRater;
 import me.madsbf.launcher.model.receivers.AppBroadcastReceiver;
 import me.madsbf.launcher.model.receivers.WallpaperBroadcastReceiver;
 import me.madsbf.launcher.model.entities.App;

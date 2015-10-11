@@ -9,11 +9,10 @@ import android.databinding.ObservableField;
 import android.databinding.ObservableInt;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
 import android.view.View;
 
-import dk.shape.library.collections.AdapterEntity;
 import dk.shape.library.collections.OnBindListener;
-import dk.shape.library.collections.adapters.RecyclerAdapter;
 import me.madsbf.launcher.R;
 import me.madsbf.launcher.SortedAppRecyclerAdapter;
 import me.madsbf.launcher.context.MainActivity;
@@ -23,8 +22,6 @@ import me.madsbf.launcher.model.entities.App;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
-
-import me.madsbf.launcher.BR;
 import rx.subjects.BehaviorSubject;
 
 public class AppsViewModel extends BaseObservable implements OnBindListener<MainAppsBinding>, MainActivity.MainInterface {
@@ -42,7 +39,11 @@ public class AppsViewModel extends BaseObservable implements OnBindListener<Main
     public final ObservableInt overlayVisibility = new ObservableInt(View.INVISIBLE);
 
     public AppsViewModel(Context context, DataManager dataManager) {
-        layoutManager.set(new GridLayoutManager(context, 4));
+        DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
+        float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
+        int columns = (int) Math.floor(dpWidth / 80);
+
+        layoutManager.set(new GridLayoutManager(context, columns));
         adapter.set(new SortedAppRecyclerAdapter());
 
         dataManager.apps
